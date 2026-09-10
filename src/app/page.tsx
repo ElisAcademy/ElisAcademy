@@ -4,7 +4,7 @@ import { NotionImage } from "@/components/ui/NotionImage";
 import { User } from "lucide-react";
 import { Hero } from "@/components/sections/Hero";
 import { HeroSlider } from "@/components/sections/HeroSlider";
-import { getHeroSlides, getStudents, getAlumni } from "@/lib/notion";
+import { getHeroSlides, getStudents, getAlumni, type Student } from "@/lib/notion";
 import { NewsPreview } from "@/components/sections/NewsPreview";
 import { Button } from "@/components/ui/button";
 
@@ -36,6 +36,30 @@ const OWNERS: Owner[] = [
   },
 ];
 
+function StudentCard({ student, className }: { student: Student; className: string }) {
+  return (
+    <div className={`group relative ${className} shrink-0 overflow-hidden rounded-xl bg-gray-100 aspect-[3/4] shadow-sm hover:shadow-xl transition-all`}>
+      <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
+        {student.image ? (
+          <NotionImage
+            src={student.image}
+            alt={`${student.name} — student-athlete at Elis Academy, ${student.program}`}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+        ) : (
+          <User className="h-16 w-16 text-gray-400/50" />
+        )}
+      </div>
+      <div className="absolute inset-x-0 bottom-0 flex flex-col justify-end bg-gradient-to-t from-primary/95 via-primary/60 to-transparent p-5 pt-16 transition-opacity duration-300 md:inset-0 md:p-6 md:opacity-0 md:group-hover:opacity-100">
+        <h4 className="text-lg font-bold text-white">{student.name}</h4>
+        <p className="text-sm text-gray-200">{student.program} • {student.year}</p>
+        <p className="text-sm text-gray-200">{student.team}</p>
+      </div>
+    </div>
+  );
+}
+
 export const revalidate = 300;
 
 export default async function Home() {
@@ -60,6 +84,8 @@ export default async function Home() {
   });
 
   const alumni = await getAlumni();
+  const honorRollStudents = students.filter((student) => student.type === "Honor Roll");
+  const regularStudents = students.filter((student) => student.type === "Student");
   return (
     <div className="flex flex-col w-full">
       <Hero />
@@ -77,7 +103,7 @@ export default async function Home() {
                 Welcome to Elis Academy — Aurora, Ontario
               </h2>
               <p className="text-lg text-white leading-relaxed">
-                Located in Aurora, Ontario, Elis Academy is a premier hockey academy and private school where student-athletes don&apos;t have to choose between academics and athletics. Our mission is to provide elite on-ice training alongside Ontario secondary school education, preparing young athletes for NCAA Division I scholarships and professional careers.
+                Elis Academy is a private school and elite hockey program in Aurora, Ontario. We combine Ontario secondary school education with professional on-ice training, preparing student-athletes for university and professional opportunities.
               </p>
               <p className="text-lg text-white leading-relaxed">
                 Founded by former professional hockey players and experienced educators, our coaching staff brings decades of NHL, AHL, and OHL experience to every training session. We invite families across the GTA to join our academy and experience the Elis difference.
@@ -163,38 +189,52 @@ export default async function Home() {
               <Link href="/admissions">Join Our Team &rarr;</Link>
             </Button>
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {students.map((student, index) => (
-              <div
-                key={index}
-                className="group relative overflow-hidden rounded-xl bg-gray-100 aspect-[3/4] shadow-sm hover:shadow-xl transition-all"
-              >
-                <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
-                  {student.image ? (
-                    <NotionImage
-                      src={student.image}
-                      alt={`${student.name} — student-athlete at Elis Academy, ${student.program}`}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                  ) : (
-                    <User className="w-16 h-16 text-gray-400/50" />
-                  )}
-                </div>
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                  <h4 className="text-white font-bold text-lg">
-                    {student.name}
-                  </h4>
-                  <p className="text-gray-200 text-sm">
-                    {student.program} • {student.year}
-                  </p>
-                  <p className="text-gray-200 text-sm">{student.team}</p>
-                </div>
-              </div>
-            ))}
+        {honorRollStudents.length > 0 && (
+          <div className="mx-auto mb-12 max-w-7xl px-4 md:px-6">
+            <h3 className="font-serif text-2xl font-bold text-primary">Honor Roll</h3>
+            <div className="mt-6 grid grid-cols-2 gap-5 md:grid-cols-4">
+              {honorRollStudents.map((student) => (
+                <StudentCard key={student.id} student={student} className="w-full" />
+              ))}
+            </div>
           </div>
+        )}
+
+        <div className="mx-auto mb-6 max-w-7xl px-4 md:px-6">
+          <h3 className="font-serif text-2xl font-bold text-primary">All Student-Athletes</h3>
+        </div>
+        <div className="w-full px-4 md:px-6">
+          <div className="student-carousel overflow-hidden rounded-2xl">
+            <div className="student-track flex w-max">
+              {[0, 1].map((copy) => (
+                <div key={copy} className="flex gap-5 pr-5" aria-hidden={copy === 1}>
+                  {regularStudents.map((student) => (
+                    <StudentCard
+                      key={`${copy}-${student.id}`}
+                      student={student}
+                      className="w-[calc((100vw-3.25rem)/2)] md:w-[280px] lg:w-[300px]"
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+          <style>{`
+            @keyframes student-scroll {
+              to { transform: translateX(-50%); }
+            }
+            .student-carousel {
+              -webkit-mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
+              mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
+            }
+            .student-track { animation: student-scroll 45s linear infinite; }
+            .student-carousel:hover .student-track { animation-play-state: paused; }
+            @media (prefers-reduced-motion: reduce) {
+              .student-track { animation-play-state: paused; }
+            }
+          `}</style>
         </div>
       </section>
 
@@ -218,7 +258,7 @@ export default async function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 text-left">
                   <h4 className="text-white font-bold text-lg">{alum.name}</h4>
                   <p className="text-gray-200 text-sm">
-                    {alum.university} • '{alum.year}
+                    {alum.university} • &apos;{alum.year}
                   </p>
                 </div>
               </div>
@@ -240,7 +280,7 @@ export default async function Home() {
               <h3 className="text-3xl font-serif font-bold text-white mb-2">
                 Alex Assadourian
                 <span className="text-gray-400 font-sans text-lg ml-2 font-normal">
-                  '25
+                  &apos;25
                 </span>
               </h3>
               <p className="text-gray-300 leading-relaxed">

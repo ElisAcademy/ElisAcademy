@@ -14,6 +14,14 @@ const programs = [
     { name: "Canadian University", href: "/programs/canadian" },
 ];
 
+const privateSchool = [
+    { name: "Courses", href: "/private-school/courses" },
+    { name: "Grade 12", href: "/private-school/grade-12" },
+    { name: "Grade 11", href: "/private-school/grade-11" },
+    { name: "Grade 10", href: "/private-school/grade-10" },
+    { name: "Grade 9", href: "/private-school/grade-9" },
+];
+
 const otherLinks = [
     { name: "Home", href: "/" },
     { name: "About Elis", href: "/about" },
@@ -26,9 +34,11 @@ const otherLinks = [
 export function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isProgramsOpen, setIsProgramsOpen] = useState(false);
+    const [isPrivateSchoolOpen, setIsPrivateSchoolOpen] = useState(false);
     const pathname = usePathname();
 
     const isProgramsActive = pathname.startsWith("/programs");
+    const isPrivateSchoolActive = pathname.startsWith("/private-school");
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
@@ -46,7 +56,7 @@ export function Navbar() {
                 </Link>
 
                 {/* Desktop Nav */}
-                <nav className="hidden md:flex md:gap-8 md:items-center" aria-label="Main navigation">
+                <nav className="hidden xl:flex xl:items-center xl:gap-8" aria-label="Main navigation">
                     <Link
                         href="/"
                         className={cn(
@@ -65,6 +75,25 @@ export function Navbar() {
                     >
                         About Elis
                     </Link>
+
+                    <div
+                        className="relative group"
+                        onMouseEnter={() => setIsPrivateSchoolOpen(true)}
+                        onMouseLeave={() => setIsPrivateSchoolOpen(false)}
+                    >
+                        <button className={cn("flex items-center text-medium font-medium transition-colors hover:text-accent focus:outline-none", isPrivateSchoolActive ? "text-accent font-semibold" : "text-primary")}>
+                            Private School<ChevronDown className="ml-1 h-4 w-4" />
+                        </button>
+                        <AnimatePresence>
+                            {isPrivateSchoolOpen && (
+                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 5 }} transition={{ duration: 0.2 }} className="absolute left-0 top-full w-56 pt-2">
+                                    <div className="overflow-hidden rounded-md border border-gray-100 bg-white py-1 shadow-lg">
+                                        {privateSchool.map((link) => <Link key={link.href} href={link.href} className={cn("block px-4 py-2 text-medium transition-colors hover:bg-gray-50 hover:text-accent", pathname === link.href ? "bg-gray-50/50 text-accent" : "text-gray-700")}>{link.name}</Link>)}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
 
                     {/* Programs Dropdown */}
                     <div
@@ -141,7 +170,7 @@ export function Navbar() {
 
                 {/* Mobile Toggle */}
                 <button
-                    className="flex items-center justify-center rounded-md p-2 text-primary md:hidden hover:bg-gray-100"
+                    className="flex items-center justify-center rounded-md p-2 text-primary hover:bg-gray-100 xl:hidden"
                     onClick={() => setIsOpen(!isOpen)}
                 >
                     <span className="sr-only">Toggle menu</span>
@@ -156,11 +185,18 @@ export function Navbar() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden border-b border-gray-100 bg-white md:hidden"
+                        className="overflow-hidden border-b border-gray-100 bg-white xl:hidden"
                     >
                         <nav className="flex flex-col space-y-4 p-4">
                             <Link href="/" onClick={() => setIsOpen(false)} className="text-base font-medium text-primary">Home</Link>
                             <Link href="/about" onClick={() => setIsOpen(false)} className="text-base font-medium text-primary">About Elis</Link>
+
+                            <div className="space-y-2">
+                                <div className="px-2 text-xs font-semibold uppercase tracking-wider text-primary/80">Private School</div>
+                                <div className="flex flex-col space-y-3 border-l-2 border-gray-100 pl-4">
+                                    {privateSchool.map((link) => <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)} className={cn("text-base font-medium transition-colors hover:text-accent", pathname === link.href ? "text-accent" : "text-primary")}>{link.name}</Link>)}
+                                </div>
+                            </div>
 
                             {/* Mobile Programs Section */}
                             <div className="space-y-2">

@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     default: "Elis Academy",
     template: "%s | Elis Academy"
   },
-  description: "Elis Academy is a premier hockey academy in Aurora, Ontario. We combine elite athletic training with rigorous academics to prepare student-athletes for NCAA Division I scholarships and professional sports careers.",
+  description: "Elis Academy is a private school and elite hockey program in Aurora, Ontario. We combine Ontario secondary school education with professional training for student-athletes pursuing university and hockey opportunities.",
   keywords: [
     "Elis Academy", "hockey academy Ontario", "elite sports training Aurora",
     "NCAA hockey scholarship", "student athlete program", "hockey training near me",
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     locale: 'en_CA',
     url: 'https://elisacademy.ca',
     title: "Elis Academy | Premier Sports & Education",
-    description: "Where Academics and Athletics Excel. Join our elite program for student-athletes.",
+    description: "Private school education and elite hockey training for student-athletes in Aurora, Ontario.",
     siteName: "Elis Academy",
     images: [
       {
@@ -89,7 +89,7 @@ export default function RootLayout({
               "url": "https://elisacademy.ca",
               "logo": "https://elisacademy.ca/logo/logo-white.png",
               "image": "https://elisacademy.ca/logo/logo-white.png",
-              "description": "Elis Academy is a premier hockey and sports academy in Aurora, Ontario. We combine elite athletic training with rigorous Ontario secondary school education to prepare student-athletes for NCAA Division I scholarships.",
+              "description": "Elis Academy is a private school and elite hockey program in Aurora, Ontario. We combine Ontario secondary school education with professional hockey training to prepare student-athletes for university opportunities.",
               "address": {
                 "@type": "PostalAddress",
                 "streetAddress": "135 Industrial Pkwy N",

@@ -26,7 +26,7 @@ export function Hero() {
                     title="Elis Academy training highlights — elite hockey and sports training in Aurora, Ontario"
                 />
             </div> */}
-            <div className="relative w-screen h-[100svh] overflow-hidden">
+            <div className="relative h-[100svh] w-full overflow-hidden">
                 <video
                     autoPlay
                     muted
@@ -64,7 +64,7 @@ export function Hero() {
 
                     {/* Subheading */}
                     <p className="mt-8 max-w-2xl text-lg text-slate-200 md:text-xl lg:text-2xl leading-relaxed font-light">
-                        Elis Academy combines elite on-ice training with rigorous Ontario secondary school academics, preparing student-athletes in Aurora and the Greater Toronto Area for NCAA Division I scholarships and professional sports careers.
+                        Elis Academy is a private school and elite hockey training academy in Aurora, Ontario. Student-athletes receive an Ontario secondary school education alongside professional-level on-ice training, preparing them for NCAA Division I scholarships and professional hockey careers.
                     </p>
 
                     {/* Buttons */}
@@ -74,8 +74,8 @@ export function Hero() {
                         </Button>
 
                         <Button size="lg" variant="outline" className="h-14 min-w-[180px] rounded-full border-slate-200 bg-white px-8 text-lg font-semibold text-primary shadow-sm transition-all hover:text-primary/90 hover:scale-105 hover:bg-slate-50 hover:border-slate-300 hover:shadow-md" asChild>
-                            <Link href="/admissions">
-                                Admissions <ArrowRight className="ml-2 h-5 w-5" />
+                            <Link href="/private-school/courses">
+                                Private School <ArrowRight className="ml-2 h-5 w-5" />
                             </Link>
                         </Button>
                     </div>

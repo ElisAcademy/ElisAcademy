@@ -5,11 +5,11 @@ import { NotionImage } from "@/components/ui/NotionImage";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "About Us",
-    description: "Learn about Elis Academy's mission, philosophy, and coaching staff. Building champions for life through elite education and sport in Ontario, Canada.",
+    title: "About Us | Private School & Hockey Academy",
+    description: "Learn about Elis Academy's private school program, elite hockey training, and the teachers and coaches who support student-athletes in Aurora, Ontario.",
     openGraph: {
         title: "About Elis Academy",
-        description: "Building Champions for Life through Education and Sport. Meet our world-class coaching staff and learn about our mission.",
+        description: "Private school education and elite hockey training. Meet the teachers and coaches behind Elis Academy.",
     },
 };
 
@@ -18,12 +18,16 @@ import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 export const revalidate = 300;
 
 export default async function AboutPage() {
-    const coaches = await getCoaches();
+    const staff = await getCoaches();
+    const staffGroups = [
+        { title: "Teachers", members: staff.filter((member) => member.type === "Teacher") },
+        { title: "Coaches", members: staff.filter((member) => member.type === "Coach") },
+    ];
     const features = [
-        { title: "Academic Excellence", icon: GraduationCap, desc: "Our teachers are dedicated and highly experienced in providing a rigorous curriculum that meets international standards, ensuring students are prepared for ivy league universities." },
-        { title: "Elite Coaching", icon: Medal, desc: "All our athletic trainers are former high level athletes with years of experience developing athletes that dominate their sports." },
-        { title: "Character Development", icon: Users, desc: "Elis Academy also fosters development in areas such as leadership, discipline, teamwork, and self-advocacy." },
-        { title: "Proven Pathways", icon: Trophy, desc: "We have a track record of successfully placing student-athletes in NCAA Division I universities." },
+        { title: "Academic Excellence", icon: GraduationCap, desc: "Our Ontario-Certified Teachers" },
+        { title: "Elite Hockey Training", icon: Medal, desc: "Former Professional Hockey Players" },
+        { title: "Student Development", icon: Users, desc: "A supportive private-school environment helps students build leadership, discipline, teamwork, and self-advocacy." },
+        { title: "Proven Pathways", icon: Trophy, desc: "We help student-athletes pursue university opportunities, including NCAA Division I pathways." },
     ];
 
     return (
@@ -32,16 +36,16 @@ export default async function AboutPage() {
             {/* Header */}
             <div className="bg-primary py-24 text-center text-white">
                 <h1 className="text-5xl font-serif font-bold animate-fade-in-up">About Elis Academy</h1>
-                <p className="mt-4 text-xl text-gray-200 max-w-2xl mx-auto">Building Champions for Life through Elite Hockey Training &amp; Education in Aurora, Ontario</p>
+                <p className="mt-4 text-xl text-gray-200 max-w-2xl mx-auto">Private School Education &amp; Elite Hockey Training in Aurora, Ontario</p>
             </div>
 
             {/* Intro */}
             <section className="py-20 bg-white" aria-label="Our philosophy and mission">
                 <div className="mx-auto max-w-4xl px-4 text-center">
                     <span className="text-accent font-bold tracking-wider uppercase text-sm">Our Philosophy</span>
-                    <h2 className="text-3xl font-serif font-bold text-primary mt-2 mb-6">A Mission of Excellence</h2>
+                    <h2 className="text-3xl font-serif font-bold text-primary mt-2 mb-6">Education and Hockey Training, Under One Roof</h2>
                     <p className="text-lg text-gray-600 leading-relaxed">
-                        Elis Academy was established in Aurora, Ontario with a singular vision: to create an elite training environment where student-athletes do not have to compromise between their education and their sport. We provide a holistic approach that integrates professional-level hockey training with Ontario secondary school academics, empowering young athletes across the Greater Toronto Area to achieve their full potential and earn NCAA Division I scholarships.
+                        Elis Academy is a private school in Aurora, Ontario for student-athletes who want a strong Ontario secondary education and elite hockey training in the same environment. Our teachers and coaches work together to help students grow in the classroom, on the ice, and on their path to university.
                     </p>
                 </div>
             </section>
@@ -69,22 +73,21 @@ export default async function AboutPage() {
             <section className="py-24 bg-white">
                 <div className="mx-auto max-w-7xl px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-serif font-bold text-primary">Meet Our Coaches</h2>
-                        <p className="mt-4 text-gray-600">Our coaches have decades of experience playing and coaching hockey at the NHL, AHL, OHL, and NCAA levels, bringing elite-level expertise to every session at our Aurora training facility.</p>
+                        <h2 className="text-4xl font-serif font-bold text-primary">Meet Our Team</h2>
+                        <p className="mt-4 text-gray-600">Our teachers support each student&apos;s education, while our coaches bring high-level hockey experience to every stage of development.</p>
                     </div>
 
-                    <div className="mb-20">
-                        <h3 className="text-2xl font-bold text-primary border-l-4 border-accent pl-4 mb-8">Coaching Staff</h3>
-                        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8">
-
-                            {coaches.length > 0 ? (
-                                coaches.map((coach) => (
-                                    <div key={coach.id} className="group">
+                    {staffGroups.map(({ title, members }) => (
+                        <div key={title} className="mb-20 last:mb-0">
+                            <h3 className="text-2xl font-bold text-primary border-l-4 border-accent pl-4 mb-8">{title}</h3>
+                            <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8">
+                                {members.map((member) => (
+                                    <div key={member.id} className="group">
                                         <div className="aspect-[3/4] bg-gray-100 rounded-lg mb-4 overflow-hidden relative shadow-sm group-hover:shadow-md transition-all">
-                                            {coach.image ? (
+                                            {member.image ? (
                                                 <NotionImage
-                                                    src={coach.image}
-                                                    alt={`${coach.name} — ${coach.role} at Elis Academy, elite hockey coaching in Aurora, Ontario`}
+                                                    src={member.image}
+                                                    alt={`${member.name}, ${member.role} at Elis Academy`}
                                                     fill
                                                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                                                 />
@@ -94,15 +97,13 @@ export default async function AboutPage() {
                                                 </div>
                                             )}
                                         </div>
-                                        <h4 className="font-bold text-lg text-primary">{coach.name}</h4>
-                                        <p className="text-accent text-sm font-medium">{coach.role}</p>
+                                        <h4 className="font-bold text-lg text-primary">{member.name}</h4>
+                                        <p className="text-accent text-sm font-medium">{member.role}</p>
                                     </div>
-                                ))
-                            ) : (
-                                <p className="text-gray-500">No coaches found.</p>
-                            )}
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    ))}
 
                     {/* <div>
                         <h3 className="text-2xl font-bold text-primary border-l-4 border-accent pl-4 mb-8">Academic Faculty</h3>

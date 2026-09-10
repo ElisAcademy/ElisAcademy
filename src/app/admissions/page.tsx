@@ -40,8 +40,13 @@ export default function AdmissionsPage() {
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 <tr>
-                                    <td className="p-4 font-medium">Full-Time Elite Program</td>
-                                    <td className="p-4">$3,500</td>
+                                    <td className="p-4 font-medium">Private Schooling</td>
+                                    <td className="p-4">TBD</td>
+                                    <td className="p-4 text-sm text-gray-600">Ontario secondary school education</td>
+                                </tr>
+                                <tr>
+                                    <td className="p-4 font-medium">Part-Time Elite Hockey</td>
+                                    <td className="p-4">$3,700</td>
                                     <td className="p-4 text-sm text-gray-600">Academic tutoring, on-ice training, off-ice strength and conditioning</td>
                                 </tr>
                                 {/* <tr>

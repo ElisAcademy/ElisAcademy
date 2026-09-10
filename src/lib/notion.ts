@@ -1,4 +1,5 @@
 import { Client } from "@notionhq/client";
+import { getStudentType, type StudentType } from "@/lib/studentType";
 import { NotionToMarkdown } from "notion-to-md";
 
 const notion = new Client({
@@ -319,7 +320,8 @@ export interface Student {
     program: string;
     year: string;
     image: string | null;
-    team: string
+    team: string;
+    type: StudentType;
 }
 
 export interface Alumni {
@@ -369,7 +371,8 @@ export const getStudents = async (): Promise<Student[]> => {
                 program: getText(props.Program) || getText(props.Sport),
                 year: getNum(props.Year) || getNum(props.Class),
                 image: image,
-                team: getText(props.Team)
+                team: getText(props.Team),
+                type: getStudentType(getText(props["Student Type"])),
             };
         });
     } catch (error) {
@@ -426,6 +429,7 @@ export interface Coach {
     id: string;
     name: string;
     role: string;
+    type: "Teacher" | "Coach";
     image: string | null;
 }
 
@@ -460,10 +464,15 @@ export const getCoaches = async (): Promise<Coach[]> => {
                 proxyNotionImage(page.cover?.external?.url || page.cover?.file?.url, page.id, 'cover') ||
                 null; // No default image for coaches, let frontend handle it or showing empty
 
+            const staffType = (getText(props.Type) || getText(props["Staff Type"])).toLowerCase() === "coach"
+                ? "Coach"
+                : "Teacher";
+
             return {
                 id: page.id,
                 name: getName(props.Name),
-                role: getText(props.Role) || getText(props.Title) || "Coach",
+                role: getText(props.Role) || getText(props.Title) || staffType,
+                type: staffType,
                 image: image
             };
         });

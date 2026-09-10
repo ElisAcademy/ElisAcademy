@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
+import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -29,15 +29,9 @@ const getDriveFileId = (url: string): string | null => {
 
 // Helper to process video URLs (Google Drive, Vimeo)
 const getVideoEmbedSrc = (url: string, autoplay: boolean = false) => {
-    // Google Drive — including drive.usercontent.google.com direct links
     if (url.includes("drive.google.com") || url.includes("drive.usercontent.google.com")) {
         const id = getDriveFileId(url);
-        if (id) {
-            // /preview is the only embeddable format; /view and uc?export=view both refuse to load in iframes
-            return `https://drive.google.com/file/d/${id}/preview`;
-        }
-        // Fallback: try replacing /view with /preview on the original URL
-        return url.replace(/\/view.*/, "/preview");
+        return id ? `https://drive.google.com/file/d/${id}/preview` : url.replace(/\/view.*/, "/preview");
     }
 
     // Vimeo
@@ -64,8 +58,10 @@ const getVideoEmbedSrc = (url: string, autoplay: boolean = false) => {
 // Individual Slide Component for Lazy Loading
 const VideoCard = ({ slide }: { slide: HeroSlide }) => {
     const [isPlaying, setIsPlaying] = useState(false);
+    const swiper = useSwiper();
 
     const handlePlay = () => {
+        swiper.autoplay.stop();
         setIsPlaying(true);
     };
 
@@ -75,7 +71,7 @@ const VideoCard = ({ slide }: { slide: HeroSlide }) => {
             <div className="relative h-full w-full bg-black">
                 {isDirectVideo(slide.videoUrl) ? (
                     <video
-                        className="h-full w-full object-cover"
+                        className="block h-full w-full object-cover"
                         src={slide.videoUrl}
                         controls
                         autoPlay
@@ -84,7 +80,7 @@ const VideoCard = ({ slide }: { slide: HeroSlide }) => {
                 ) : (
                     <iframe
                         src={getVideoEmbedSrc(slide.videoUrl, true)}
-                        className="h-full w-full"
+                        className="absolute -top-[7%] block h-[114%] w-full"
                         frameBorder="0"
                         allow="autoplay; fullscreen; picture-in-picture"
                         allowFullScreen
@@ -158,6 +154,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
                     modules={[Autoplay, Pagination, Navigation]}
                     style={{
                         "--swiper-navigation-color": "color-mix(in srgb, var(--primary) 30%, white)",
+                        "--swiper-navigation-top-offset": "calc((100% - 3.5rem) / 2)",
                         "--swiper-pagination-color": "var(--primary)",
                     } as React.CSSProperties}
                     spaceBetween={24}

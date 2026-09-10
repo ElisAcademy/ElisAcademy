@@ -22,3 +22,24 @@ body {
   color: var(--foreground);
   font-family: var(--font-inter), sans-serif;
 }
+
+/* Shared page headers need an inline gutter and a smaller mobile type scale. */
+#main-content > div > .bg-primary.text-center.text-white {
+  padding-inline: 1rem;
+}
+
+#main-content > div > .bg-primary.text-center.text-white > h1 {
+  font-size: 2.25rem;
+  overflow-wrap: anywhere;
+}
+
+#main-content > div > .bg-primary.text-center.text-white > p {
+  margin-inline: auto;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  #main-content > div > .bg-primary.text-center.text-white > h1 {
+    font-size: 3rem;
+  }
+}

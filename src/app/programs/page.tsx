@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     description: "Explore Elis Academy's programs: our flagship Elite Program for full-time student-athletes, and detailed NCAA & Canadian university application guidance.",
     openGraph: {
         title: "Programs | Elis Academy",
-        description: "Pathways to Success — elite athletic training combined with top-tier academic support.",
+        description: "Private school education and elite hockey training for student-athletes pursuing university and professional opportunities.",
     },
 };
 

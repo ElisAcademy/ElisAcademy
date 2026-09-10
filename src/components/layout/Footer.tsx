@@ -31,7 +31,7 @@ export function Footer({ variant = "light" }: FooterProps) {
                         "mt-4 max-w-xs text-sm leading-relaxed",
                         isDark ? "text-gray-300" : "text-gray-600"
                     )}>
-                        Premier hockey academy in Aurora, Ontario. Combining elite athletic training with Ontario secondary school academics to develop NCAA-ready student-athletes.
+                        Private school and elite hockey program in Aurora, Ontario. Combining Ontario secondary school education with professional hockey training to prepare student-athletes for university and beyond.
                     </p>
                 </div>
 
