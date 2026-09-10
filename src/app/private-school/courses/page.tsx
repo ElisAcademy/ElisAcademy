@@ -30,7 +30,9 @@ export default async function CoursesPage() {
                         <h2 className="font-serif text-2xl font-bold text-primary">2026-2027 Ministry Course Calendar</h2>
                         <p className="mt-2 text-gray-600">View the complete course calendar and Ministry information.</p>
                     </div>
-                    <Button size="lg" className="w-full shrink-0 whitespace-nowrap sm:w-auto">View Course Schedule</Button>
+                    <Button asChild size="lg" className="w-full shrink-0 whitespace-nowrap sm:w-auto">
+                        <a href="/documents/course-calendar-2026-2027.pdf" target="_blank" rel="noreferrer">View Course Schedule</a>
+                    </Button>
                 </div>
                 <CoursesExplorer coursesByGrade={coursesByGrade} />
             </section>
