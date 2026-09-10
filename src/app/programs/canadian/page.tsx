@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { CheckCircle, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

@@ -17,5 +17,5 @@ export function NotionImage(props: ImageProps) {
     const src = typeof props.src === "string" ? props.src : "";
     const isProxied = src.startsWith("/api/notion-image");
 
-    return <Image {...props} unoptimized={isProxied || props.unoptimized} />;
+    return <Image {...props} alt={props.alt} unoptimized={isProxied || props.unoptimized} />;
 }

@@ -3,13 +3,30 @@ import { Client } from "@notionhq/client";
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
+type NotionFile = {
+    file?: { url?: string | null };
+    external?: { url?: string | null };
+};
+
+type NotionImageProperty = {
+    type?: string;
+    url?: string | null;
+    files?: NotionFile[];
+    rich_text?: Array<{ plain_text?: string | null }>;
+};
+
+type NotionImagePage = {
+    cover?: NotionFile | null;
+    properties: Record<string, NotionImageProperty>;
+};
+
 /**
  * Fetches a fresh image URL from the Notion API for a given page + property.
  * Used as a fallback when the S3 signed URL embedded in the HTML has expired.
  */
 async function getFreshUrl(pageId: string, prop: string): Promise<string | null> {
     try {
-        const page = await notion.pages.retrieve({ page_id: pageId }) as any;
+        const page = await notion.pages.retrieve({ page_id: pageId }) as unknown as NotionImagePage;
 
         // Special case: page cover image
         if (prop === "cover") {
@@ -27,13 +44,15 @@ async function getFreshUrl(pageId: string, prop: string): Promise<string | null>
         }
         if (!property) return null;
 
-        if (property.type === "url") return property.url;
-        if (property.type === "files" && property.files?.length > 0) {
-            const f = property.files[0];
+        if (property.type === "url") return property.url || null;
+        const files = property.files;
+        if (property.type === "files" && files?.length) {
+            const f = files[0];
             return f.file?.url || f.external?.url || null;
         }
-        if (property.type === "rich_text" && property.rich_text?.length > 0) {
-            return property.rich_text[0].plain_text?.trim() || null;
+        const richText = property.rich_text;
+        if (property.type === "rich_text" && richText?.length) {
+            return richText[0].plain_text?.trim() || null;
         }
     } catch (err) {
         console.error(`[notion-image] Failed to get fresh URL for ${pageId}/${prop}:`, err);

@@ -8,6 +8,28 @@ const notion = new Client({
 
 const n2m = new NotionToMarkdown({ notionClient: notion });
 
+type NotionFile = {
+    file?: { url?: string | null };
+    external?: { url?: string | null };
+};
+
+type NotionProperty = {
+    type?: string;
+    url?: string | null;
+    files?: NotionFile[];
+    rich_text?: Array<{ plain_text?: string | null }>;
+    title?: Array<{ plain_text?: string | null }>;
+    select?: { name?: string | null };
+    date?: { start?: string | null };
+    number?: number | null;
+};
+
+type NotionPage = {
+    id: string;
+    properties: Record<string, NotionProperty>;
+    cover?: NotionFile | null;
+};
+
 /**
  * Proxy Notion S3 signed image URLs through our `/api/notion-image` route.
  * Notion-hosted files use temporary signed URLs on
@@ -22,7 +44,7 @@ const n2m = new NotionToMarkdown({ notionClient: notion });
  *
  * External URLs (Google Drive, Unsplash, etc.) are returned as-is.
  */
-const proxyNotionImage = (url: string | null, pageId?: string, prop?: string): string | null => {
+const proxyNotionImage = (url: string | null | undefined, pageId?: string, prop?: string): string | null => {
     if (!url) return null;
     if (url.includes('amazonaws.com') || url.includes('notion-static.com') || url.includes('file.notion.so')) {
         // Build a proxy URL. If we have pageId+prop, the proxy can fetch a fresh
@@ -38,18 +60,18 @@ const proxyNotionImage = (url: string | null, pageId?: string, prop?: string): s
 
 // Helper to extract the raw URL string from a Notion property.
 // Does NOT transform Google Drive URLs — callers decide how to handle them.
-const getRawNotionUrl = (prop: any): string | null => {
+const getRawNotionUrl = (prop: NotionProperty | undefined): string | null => {
     let url: string | null = null;
     if (!prop) return null;
-    if (prop.type === 'url') url = prop.url;
-    else if (prop.type === 'files' && prop.files?.length > 0) {
-        const fileObj = prop.files.find((f: any) => f.file?.url || f.external?.url);
+    if (prop.type === 'url') url = prop.url || null;
+    else if (prop.type === 'files') {
+        const fileObj = prop.files?.find((file) => file.file?.url || file.external?.url);
         if (fileObj) {
-            url = fileObj.file?.url || fileObj.external?.url;
+            url = fileObj.file?.url || fileObj.external?.url || null;
         }
     }
-    else if (prop.type === 'rich_text' && prop.rich_text?.length > 0) {
-        url = prop.rich_text[0].plain_text;
+    else if (prop.type === 'rich_text') {
+        url = prop.rich_text?.[0]?.plain_text || null;
     }
     return url ? url.trim() : null;
 };
@@ -57,7 +79,7 @@ const getRawNotionUrl = (prop: any): string | null => {
 // For IMAGE properties: transforms Google Drive share links into a direct
 // display URL that works with Next.js Image optimisation.
 // Also proxies Notion S3 signed URLs through our API route.
-const getNotionUrl = (prop: any, pageId?: string, propName?: string): string | null => {
+const getNotionUrl = (prop: NotionProperty | undefined, pageId?: string, propName?: string): string | null => {
     const url = getRawNotionUrl(prop);
     if (!url) return null;
 
@@ -81,7 +103,7 @@ const getNotionUrl = (prop: any, pageId?: string, propName?: string): string | n
 // For VIDEO properties: returns the original URL unchanged for Google Drive/Vimeo
 // so that HeroSlider can build the correct embeddable /preview URL.
 // Notion direct video uploads are proxied to avoid signed URL expiration.
-const getNotionVideoUrl = (prop: any, pageId?: string, propName?: string): string | null => {
+const getNotionVideoUrl = (prop: NotionProperty | undefined, pageId?: string, propName?: string): string | null => {
     const url = getRawNotionUrl(prop);
     if (!url) return null;
     if (url.includes('drive.google.com') || url.includes('vimeo.com')) {
@@ -123,7 +145,8 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
         ],
     });
 
-    return response.results.map((page: any) => {
+    return response.results.map((result) => {
+        const page = result as unknown as NotionPage;
         const properties = page.properties;
 
         // Helper to extract URL from various property types
@@ -140,12 +163,12 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
 
         return {
             id: page.id,
-            title: properties.Title?.title[0]?.plain_text || "Untitled",
-            slug: properties.Slug?.rich_text[0]?.plain_text || page.id,
+            title: properties.Title?.title?.[0]?.plain_text || "Untitled",
+            slug: properties.Slug?.rich_text?.[0]?.plain_text || page.id,
             date: properties.Date?.date?.start || new Date().toISOString().split('T')[0],
             coverImage: customCoverUrl || pageCoverUrl || undefined,
-            description: properties.Description?.rich_text?.map((r: any) => r.plain_text).join("") || "",
-            content: properties.Content?.rich_text?.map((r: any) => r.plain_text).join("") || "",
+            description: properties.Description?.rich_text?.map((text) => text.plain_text).join("") || "",
+            content: properties.Content?.rich_text?.map((text) => text.plain_text).join("") || "",
         };
     });
 }
@@ -185,11 +208,11 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
         return null;
     }
 
-    const page = response.results[0];
+    const page = response.results[0] as unknown as NotionPage;
     const mdblocks = await n2m.pageToMarkdown(page.id);
     const mdString = n2m.toMarkdownString(mdblocks);
 
-    const properties = (page as any).properties;
+    const properties = page.properties;
 
     // Helper to extract URL from various property types (re-defined here for scoping, same as above)
     // using global getNotionUrl instead
@@ -199,22 +222,22 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
         getNotionUrl(properties["Cover Image"], page.id, 'Cover Image') ||
         getNotionUrl(properties["cover image"], page.id, 'cover image');
 
-    const pageCoverUrl = proxyNotionImage((page as any).cover?.external?.url || (page as any).cover?.file?.url, page.id, 'cover');
+    const pageCoverUrl = proxyNotionImage(page.cover?.external?.url || page.cover?.file?.url, page.id, 'cover');
 
     // Content: Prioritize Page Body (Markdown blocks), fallback to "Content" property
     let finalContent = mdString.parent;
     if (!finalContent || finalContent.trim() === "") {
         const richText = properties.Content?.rich_text || properties.content?.rich_text;
-        finalContent = richText?.map((r: any) => r.plain_text).join("") || "";
+        finalContent = richText?.map((text) => text.plain_text).join("") || "";
     }
 
     return {
         id: page.id,
-        title: properties.Title?.title[0]?.plain_text || "Untitled",
-        slug: properties.Slug?.rich_text[0]?.plain_text || page.id,
+        title: properties.Title?.title?.[0]?.plain_text || "Untitled",
+        slug: properties.Slug?.rich_text?.[0]?.plain_text || page.id,
         date: properties.Date?.date?.start || new Date().toISOString().split('T')[0],
         coverImage: customCoverUrl || pageCoverUrl || undefined,
-        description: properties.Description?.rich_text[0]?.plain_text || "",
+        description: properties.Description?.rich_text?.[0]?.plain_text || "",
         content: finalContent
     };
 }
@@ -264,7 +287,8 @@ export const getHeroSlides = async (): Promise<HeroSlide[]> => {
             // ],
         });
 
-        const slides: HeroSlide[] = response.results.map((page: any) => {
+        const slides: HeroSlide[] = response.results.map((result) => {
+            const page = result as unknown as NotionPage;
             const props = page.properties;
 
             // Debugging: Log available property names to console
@@ -279,7 +303,7 @@ export const getHeroSlides = async (): Promise<HeroSlide[]> => {
 
             // Get video/media URL — use the raw helper so Drive links aren't
             // converted to uc?export=view (which blocks iframe embedding).
-            let videoUrl = getNotionVideoUrl(props.VideoURL, page.id, 'VideoURL');
+            const videoUrl = getNotionVideoUrl(props.VideoURL, page.id, 'VideoURL');
 
             // Get Image URL: 
             // 1. Check for a "CoverImage" property (Files & Media) as requested by user
@@ -348,12 +372,13 @@ export const getStudents = async (): Promise<Student[]> => {
             },
         });
 
-        return response.results.map((page: any) => {
+        return response.results.map((result) => {
+            const page = result as unknown as NotionPage;
             const props = page.properties;
 
-            const getName = (prop: any) => prop?.title?.[0]?.plain_text || "Untitled";
-            const getText = (prop: any) => prop?.rich_text?.[0]?.plain_text || prop?.select?.name || "";
-            const getNum = (prop: any) => prop?.number?.toString() || "";
+            const getName = (prop: NotionProperty | undefined) => prop?.title?.[0]?.plain_text || "Untitled";
+            const getText = (prop: NotionProperty | undefined) => prop?.rich_text?.[0]?.plain_text || prop?.select?.name || "";
+            const getNum = (prop: NotionProperty | undefined) => prop?.number?.toString() || "";
 
             // Image extraction helper
             // Image extraction helper
@@ -397,12 +422,13 @@ export const getAlumni = async (): Promise<Alumni[]> => {
             },
         });
 
-        return response.results.map((page: any) => {
+        return response.results.map((result) => {
+            const page = result as unknown as NotionPage;
             const props = page.properties;
 
-            const getName = (prop: any) => prop?.title?.[0]?.plain_text || "Untitled";
-            const getText = (prop: any) => prop?.rich_text?.[0]?.plain_text || prop?.select?.name || "";
-            const getNum = (prop: any) => prop?.number?.toString() || "";
+            const getName = (prop: NotionProperty | undefined) => prop?.title?.[0]?.plain_text || "Untitled";
+            const getText = (prop: NotionProperty | undefined) => prop?.rich_text?.[0]?.plain_text || prop?.select?.name || "";
+            const getNum = (prop: NotionProperty | undefined) => prop?.number?.toString() || "";
 
             const getUrlFromProp = getNotionUrl;
 
@@ -449,11 +475,12 @@ export const getCoaches = async (): Promise<Coach[]> => {
             },
         });
 
-        return response.results.map((page: any) => {
+        return response.results.map((result) => {
+            const page = result as unknown as NotionPage;
             const props = page.properties;
 
-            const getName = (prop: any) => prop?.title?.[0]?.plain_text || "Untitled";
-            const getText = (prop: any) => prop?.rich_text?.[0]?.plain_text || prop?.select?.name || "";
+            const getName = (prop: NotionProperty | undefined) => prop?.title?.[0]?.plain_text || "Untitled";
+            const getText = (prop: NotionProperty | undefined) => prop?.rich_text?.[0]?.plain_text || prop?.select?.name || "";
 
             // Image extraction helper
             const getUrlFromProp = getNotionUrl;
@@ -505,11 +532,12 @@ export const getUniversities = async (): Promise<University[]> => {
             },
         });
 
-        return response.results.map((page: any) => {
+        return response.results.map((result) => {
+            const page = result as unknown as NotionPage;
             const props = page.properties;
 
-            const getName = (prop: any) => prop?.title?.[0]?.plain_text || "Untitled";
-            const getText = (prop: any) => prop?.rich_text?.[0]?.plain_text || prop?.url || "";
+            const getName = (prop: NotionProperty | undefined) => prop?.title?.[0]?.plain_text || "Untitled";
+            const getText = (prop: NotionProperty | undefined) => prop?.rich_text?.[0]?.plain_text || prop?.url || "";
 
             return {
                 id: page.id,

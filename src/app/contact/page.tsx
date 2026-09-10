@@ -147,7 +147,7 @@ export default function ContactPage() {
                             {status === 'success' && (
                                 <div className="p-4 bg-green-50 text-green-700 rounded-lg flex items-center">
                                     <CheckCircle className="h-5 w-5 mr-2" />
-                                    <span>Message sent successfully! We'll get back to you soon.</span>
+                                    <span>Message sent successfully! We&apos;ll get back to you soon.</span>
                                 </div>
                             )}
 

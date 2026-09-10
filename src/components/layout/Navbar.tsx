@@ -22,15 +22,6 @@ const privateSchool = [
     { name: "Grade 9", href: "/private-school/grade-9" },
 ];
 
-const otherLinks = [
-    { name: "Home", href: "/" },
-    { name: "About Elis", href: "/about" },
-    // Programs is handled specially
-    { name: "Admissions", href: "/admissions" },
-    { name: "Volunteer", href: "/volunteer" },
-    { name: "Contact", href: "/contact" },
-];
-
 export function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isProgramsOpen, setIsProgramsOpen] = useState(false);

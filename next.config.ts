@@ -1,13 +1,5 @@
 import type { NextConfig } from "next";
 
-const originalEmitWarning = process.emitWarning;
-process.emitWarning = function(warning: any, ...args: any[]) {
-  if (warning && warning.name === 'DeprecationWarning' && warning.message && warning.message.includes('url.parse')) {
-    return;
-  }
-  return originalEmitWarning.call(process, warning, ...args);
-};
-
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -26,6 +18,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "*.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.google.com",
       },
     ],
   },

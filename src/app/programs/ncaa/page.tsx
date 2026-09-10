@@ -1,6 +1,4 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Check, Info, School } from "lucide-react";
+import { Check } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UniversityGrid } from "@/components/programs/UniversityGrid";
 import type { Metadata } from "next";
