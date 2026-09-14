@@ -197,7 +197,7 @@ export default async function Home() {
         {honorRollStudents.length > 0 && (
           <div className="mb-12">
             <div className="mx-auto mb-6 max-w-7xl px-4 md:px-6">
-              <h3 className="font-serif text-2xl font-bold text-primary">Honor Roll</h3>
+              <h3 className="font-serif text-2xl font-bold text-primary">Honour Roll</h3>
             </div>
             <div className="w-full px-4 md:px-6">
               <div className="student-carousel overflow-hidden rounded-2xl">
