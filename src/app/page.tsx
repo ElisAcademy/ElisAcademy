@@ -35,6 +35,18 @@ const OWNERS: Owner[] = [
     bio: "Tom attended Bowling Green State university on a full athletic scholarship. He then played 10 years of professional hockey in North America and Europe including for the Colorado Avalanche organization of the NHL. After retiring from professional hockey, Tom began his coaching and training career preparing young people for the NCAA and OHL.",
     image: "/pics/owner/owner3.webp",
   },
+  {
+    name: "Lia de Baat",
+    role: "Head Fitness Trainer",
+    bio: "Lia is the Owner of The Exercise Lab and a Strength & Conditioning Coach specializing in the development of high-performance athletes. A former NCAA Division I soccer player and Colombian National Team athlete, Lia works extensively with hockey players and organizations, including York Simcoe Express, Newmarket Minor Hockey Association, and Upper York Minor Hockey Association. She has worked with athletes preparing for and competing in the NCAA Division I, OHL, and Canadian National Team.",
+    image: "/pics/owner/lia-de-baat.jpeg",
+  },
+  {
+    name: "Tyler Sikura",
+    role: "On-Ice Trainer",
+    bio: "Tyler attended Dartmouth College and was captain of the hockey team, The Big Green, for two years before entering the professional ranks. He had a decade-long playing career, highlighted by NHL contracts with the Chicago Blackhawks and Columbus Blue Jackets. He is the co-founder of the Elite Summer Training Program at St. Andrew’s College.",
+    image: "/pics/owner/tyler-sikura.jpeg",
+  },
 ];
 
 function StudentCard({ student, className }: { student: Student; className: string }) {
@@ -149,11 +161,11 @@ export default async function Home() {
               Guiding Elis Academy with decades of combined NHL, AHL, OHL, and NCAA experience in elite hockey development and educational leadership.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-6">
             {OWNERS.map((owner, index) => (
               <div
                 key={index}
-                className="flex flex-col items-center text-center group"
+                className={`group flex flex-col items-center text-center lg:col-span-2 ${index === 3 ? "lg:col-start-2" : index === 4 ? "lg:col-start-4" : ""}`}
               >
                 <div className="w-72 h-72 rounded-full bg-white mb-6 overflow-hidden relative shadow-md border-4 border-white transition-colors">
                   <Image
