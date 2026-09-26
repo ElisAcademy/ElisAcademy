@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, HandHeart, ImageIcon, Palette } from "lucide-react";
@@ -19,12 +20,20 @@ export default function VolunteerPage() {
             icon: BookOpen,
             description: "Help sort, organize, and share books that keep our Little Library welcoming for students and families.",
             placeholder: "from-sky-100 via-white to-blue-50",
+            image: {
+                src: "/pics/volunteer/little-library.jpg",
+                alt: "Elis Academy Little Library — a navy and yellow book house filled with donated children's books",
+            },
         },
         {
             title: "Arts Auction",
             icon: Palette,
             description: "Support student creativity by helping prepare, display, and celebrate work at our community arts auction.",
             placeholder: "from-amber-100 via-white to-orange-50",
+            image: {
+                src: "/pics/volunteer/arts-auction.jpg",
+                alt: "Student paintings displayed at the Elis Academy community arts auction",
+            },
         },
         {
             title: "Food Bank",
@@ -58,13 +67,22 @@ export default function VolunteerPage() {
                     return (
                         <section key={opportunity.title} className={isDark ? "bg-primary text-white" : index === 0 ? "bg-gray-50" : "bg-accent/5"}>
                             <div className="grid md:min-h-[440px] md:grid-cols-2">
-                                <div className={`relative flex min-h-[360px] items-center justify-center bg-gradient-to-br ${opportunity.placeholder} ${index % 2 === 1 ? "md:order-2" : ""}`}>
+                                <div className={`relative flex min-h-[360px] items-center justify-center overflow-hidden bg-gradient-to-br ${opportunity.placeholder} ${index % 2 === 1 ? "md:order-2" : ""}`}>
+                                {opportunity.image ? (
+                                    <Image
+                                        src={opportunity.image.src}
+                                        alt={opportunity.image.alt}
+                                        fill
+                                        sizes="(min-width: 768px) 50vw, 100vw"
+                                        className="object-cover" />
+                                ) : (
                                 <div className="flex flex-col items-center gap-3 text-primary/70">
                                     <div className="rounded-full bg-white/80 p-4 shadow-sm">
                                         <ImageIcon className="h-7 w-7" aria-hidden="true" />
                                     </div>
                                     <span className="text-sm font-medium">Photo coming soon</span>
                                 </div>
+                                )}
                                 </div>
                                 <div className="flex items-center px-8 py-16 md:px-16 lg:px-24">
                                     <div className="max-w-md">
