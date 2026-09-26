@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, HandHeart, ImageIcon, Palette } from "lucide-react";
 import type { Metadata } from "next";
+import artsAuctionPhoto from "../../../public/pics/volunteer/arts-auction.jpg";
+import littleLibraryPhoto from "../../../public/pics/volunteer/little-library.jpg";
 
 export const metadata: Metadata = {
     title: "Volunteer",
@@ -21,7 +23,7 @@ export default function VolunteerPage() {
             description: "Help sort, organize, and share books that keep our Little Library welcoming for students and families.",
             placeholder: "from-sky-100 via-white to-blue-50",
             image: {
-                src: "/pics/volunteer/little-library.jpg",
+                src: littleLibraryPhoto,
                 alt: "Elis Academy Little Library — a navy and yellow book house filled with donated children's books",
             },
         },
@@ -31,7 +33,7 @@ export default function VolunteerPage() {
             description: "Support student creativity by helping prepare, display, and celebrate work at our community arts auction.",
             placeholder: "from-amber-100 via-white to-orange-50",
             image: {
-                src: "/pics/volunteer/arts-auction.jpg",
+                src: artsAuctionPhoto,
                 alt: "Student paintings displayed at the Elis Academy community arts auction",
             },
         },
@@ -74,6 +76,8 @@ export default function VolunteerPage() {
                                         alt={opportunity.image.alt}
                                         fill
                                         sizes="(min-width: 768px) 50vw, 100vw"
+                                        placeholder="blur"
+                                        preload={index === 0}
                                         className="object-cover" />
                                 ) : (
                                 <div className="flex flex-col items-center gap-3 text-primary/70">
