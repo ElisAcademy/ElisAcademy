@@ -22,8 +22,8 @@ export function Footer({ variant = "light" }: FooterProps) {
                                 src={isDark ? "/logo/logo-white.png" : "/logo/logo-blue.png"}
                                 alt="Elis Academy"
                                 fill
+                                sizes="192px"
                                 className="object-contain -ml-2"
-                                priority
                             />
                         </div>
                     </Link>

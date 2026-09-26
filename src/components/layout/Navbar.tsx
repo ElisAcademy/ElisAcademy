@@ -40,6 +40,7 @@ export function Navbar() {
                             src="/logo/logo-blue.png"
                             alt="Elis Academy"
                             fill
+                            sizes="192px"
                             className="object-contain object-left"
                             priority
                         />
